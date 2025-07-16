@@ -1,0 +1,6 @@
+name: NeuroPilot GitHub Actions
+description: Uhh... you shouldn't reference this repo itself.
+
+runs:
+  using: 'node20'
+  main: "index.js"

@@ -1,0 +1,13 @@
+{
+  "name": "neuropilot-github-actions",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Monorepo for NeuroPilot GitHub Actions",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "echo \"Building subdirectories...\"",
+    "test-reports": "pnpm --filter=@neuropilot/send-test-repo",
+    "version-get": "pnpm --filter=@neuropilot/get-package-version"
+  },
+  "license": "UNLICENSED"
+}

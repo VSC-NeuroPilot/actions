@@ -1,0 +1,6 @@
+name: Send to Unit Test Coverage repo
+description: Sends information to the unit test coverage repository
+
+runs:
+  using: 'node20'
+  main: "dist/index.js"

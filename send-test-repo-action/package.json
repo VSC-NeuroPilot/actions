@@ -1,0 +1,23 @@
+{
+  "name": "@neuropilot/send-test-repo",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "compile": "tsc",
+    "build": "tsc"
+  },
+  "author": "KTrain5369",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@types/node": "^24.0.14",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@actions/artifact": "^2.3.2",
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.1",
+    "@actions/glob": "^0.5.0"
+  }
+}
