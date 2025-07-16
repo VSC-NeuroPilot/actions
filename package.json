@@ -5,6 +5,7 @@
   "description": "Monorepo for NeuroPilot GitHub Actions",
   "main": "dist/index.js",
   "scripts": {
+    "compile": "echo \"Compiling subdirectories...\"",
     "build": "echo \"Building subdirectories...\"",
     "test-reports": "pnpm --filter=@neuropilot/send-test-repo",
     "version-get": "pnpm --filter=@neuropilot/get-package-version"
