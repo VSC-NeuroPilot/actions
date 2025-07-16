@@ -1,6 +1,13 @@
 name: Send to Unit Test Coverage repo
 description: Sends information to the unit test coverage repository
 
+inputs:
+  artifact-name:
+    description: 'Name of the uploaded artifact'
+    required: false
+  github-token:
+    description: 'GitHub token to use to trigger the workflow'
+
 runs:
   using: 'node20'
   main: "dist/index.js"

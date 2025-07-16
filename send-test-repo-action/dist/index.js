@@ -15,7 +15,7 @@ async function run() {
         const targetRepo = "unit-tests";
         const targetOwner = "VSC-NeuroPilot";
         // Get repository name for artifact naming
-        const artifactName = github.context.repo.repo;
+        const artifactName = core.getInput('artifact-name') ?? github.context.repo.repo;
         core.info(`📁 Folder path: ${folderPath}`);
         core.info(`🏷️  Artifact name: ${artifactName}`);
         core.debug(`🎯 Target workflow: ${targetWorkflow}`);
