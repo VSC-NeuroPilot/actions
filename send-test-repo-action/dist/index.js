@@ -5,17 +5,33 @@ const github = require("@actions/github");
 const artifact = require("@actions/artifact");
 const glob = require("@actions/glob");
 const path = require("path");
+const fs = require("fs");
+function getPackageJson() {
+    try {
+        const packagePath = path.join(process.cwd(), 'package.json');
+        const packageContent = fs.readFileSync(packagePath, 'utf-8');
+        return JSON.parse(packageContent);
+    }
+    catch (error) {
+        return null;
+    }
+}
 async function run() {
     try {
         core.startGroup('🔧 Getting inputs and configuration');
         // Get inputs
         const token = core.getInput('github-token') ?? process.env.GITHUB_TOKEN;
-        const folderPath = core.getInput('folder-path', { required: true });
+        const folderPath = core.getInput('dir', { required: true });
         const targetWorkflow = 175007698;
         const targetRepo = "unit-tests";
         const targetOwner = "VSC-NeuroPilot";
         // Get repository name for artifact naming
         const artifactName = core.getInput('artifact-name') ?? github.context.repo.repo;
+        let pageName = core.getInput('page-name') ?? getPackageJson()?.displayName ?? getPackageJson()?.name;
+        if (!pageName) {
+            core.warning("No name provided! Falling back to artifact name!");
+            pageName = artifactName;
+        }
         core.info(`📁 Folder path: ${folderPath}`);
         core.info(`🏷️  Artifact name: ${artifactName}`);
         core.debug(`🎯 Target workflow: ${targetWorkflow}`);
@@ -38,6 +54,7 @@ async function run() {
         if (files.length === 0) {
             throw new Error(`No files found in ${folderPath}`);
         }
+        fs.writeFileSync(path.join(folderPath, "info.json"), `{name:${pageName}}`);
         // Upload artifact
         core.info('⬆️  Starting artifact upload...');
         const uploadResponse = await artifactClient.uploadArtifact(artifactName, files, path.dirname(folderPath), {
@@ -45,7 +62,6 @@ async function run() {
         });
         if (!uploadResponse.id) {
             core.setFailed("No artifact uploaded!");
-            return;
         }
         core.info(`✅ Artifact uploaded successfully. ID: ${uploadResponse.id}`);
         core.notice(`Artifact "${artifactName}" uploaded with ID: ${uploadResponse.id}`);
@@ -66,10 +82,8 @@ async function run() {
         // Prepare workflow dispatch payload
         const workflowInputs = {
             'artifact-id': uploadResponse.id.toString(),
-            'artifact-name': artifactName,
-            'source-repository': `${github.context.repo.owner}/${github.context.repo.repo}`,
-            'source-run-id': github.context.runId.toString(),
-            'source-sha': github.context.sha
+            'repo': `${github.context.repo.owner}/${github.context.repo.repo}`,
+            'folder-name': artifactName
         };
         core.info(`🎯 Triggering workflow ${targetWorkflow} in ${targetOwner}/${targetRepo}`);
         core.debug(`Workflow inputs: ${JSON.stringify(workflowInputs, null, 2)}`);

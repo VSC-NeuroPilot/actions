@@ -1,5 +1,5 @@
 {
-  "name": "neuropilot-github-actions",
+  "name": "@neuropilot/github-actions",
   "private": true,
   "version": "1.0.0",
   "description": "Monorepo for NeuroPilot GitHub Actions",
@@ -7,8 +7,7 @@
   "scripts": {
     "compile": "echo \"Compiling subdirectories...\"",
     "build": "echo \"Building subdirectories...\"",
-    "test-reports": "pnpm --filter=@neuropilot/send-test-repo",
-    "version-get": "pnpm --filter=@neuropilot/get-package-version"
+    "test-reports": "pnpm --filter=@neuropilot/send-test-repo"
   },
   "license": "UNLICENSED"
 }

@@ -2,11 +2,18 @@ name: Send to Unit Test Coverage repo
 description: Sends information to the unit test coverage repository
 
 inputs:
-  artifact-name:
-    description: 'Name of the uploaded artifact'
+  page-name:
+    description: 'Name to give on the page. If omitted, falls back to display name -> actual name (package.json) -> artifact name input'
     required: false
+  artifact-name:
+    description: 'Artifact name to use when uploading. Defaults to the repository name. This affects the path they are available on in the test report site.'
+    required: false
+  dir:
+    description: 'Directory to upload as test report.'
+    required: true
   github-token:
-    description: 'GitHub token to use to trigger the workflow'
+    description: 'GitHub token to use to trigger the workflow. Defaults to ${{ secrets.GITHUB_TOKEN }}'
+    required: false
 
 runs:
   using: 'node20'

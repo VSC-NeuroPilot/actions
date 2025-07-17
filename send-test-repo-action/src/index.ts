@@ -3,6 +3,17 @@ import * as github from '@actions/github'
 import * as artifact from '@actions/artifact'
 import * as glob from '@actions/glob'
 import * as path from 'path'
+import * as fs from 'fs'
+
+function getPackageJson(): Record<string, any> | null {
+    try {
+        const packagePath = path.join(process.cwd(), 'package.json')
+        const packageContent = fs.readFileSync(packagePath, 'utf-8')
+        return JSON.parse(packageContent)
+    } catch (error) {
+        return null
+    }
+}
 
 async function run(): Promise<void> {
     try {
@@ -10,13 +21,18 @@ async function run(): Promise<void> {
 
         // Get inputs
         const token = core.getInput('github-token') ?? process.env.GITHUB_TOKEN
-        const folderPath = core.getInput('folder-path', { required: true })
+        const folderPath = core.getInput('dir', { required: true })
         const targetWorkflow = 175007698
         const targetRepo = "unit-tests"
         const targetOwner = "VSC-NeuroPilot"
 
         // Get repository name for artifact naming
         const artifactName = core.getInput('artifact-name') ?? github.context.repo.repo
+        let pageName = core.getInput('page-name') ?? getPackageJson()?.displayName ?? getPackageJson()?.name
+        if (!pageName) {
+            core.warning("No name provided! Falling back to artifact name!")
+            pageName = artifactName
+        }
 
         core.info(`📁 Folder path: ${folderPath}`)
         core.info(`🏷️  Artifact name: ${artifactName}`)
@@ -47,6 +63,8 @@ async function run(): Promise<void> {
             throw new Error(`No files found in ${folderPath}`)
         }
 
+        fs.writeFileSync(path.join(folderPath, "info.json"), `{name:${pageName}}`)
+
         // Upload artifact
         core.info('⬆️  Starting artifact upload...')
         const uploadResponse = await artifactClient.uploadArtifact(
@@ -60,7 +78,6 @@ async function run(): Promise<void> {
 
         if (!uploadResponse.id) {
             core.setFailed("No artifact uploaded!")
-            return
         }
 
         core.info(`✅ Artifact uploaded successfully. ID: ${uploadResponse.id}`)
@@ -90,10 +107,8 @@ async function run(): Promise<void> {
         // Prepare workflow dispatch payload
         const workflowInputs = {
             'artifact-id': uploadResponse.id!.toString(),
-            'artifact-name': artifactName,
-            'source-repository': `${github.context.repo.owner}/${github.context.repo.repo}`,
-            'source-run-id': github.context.runId.toString(),
-            'source-sha': github.context.sha
+            'repo': `${github.context.repo.owner}/${github.context.repo.repo}`,
+            'folder-name': artifactName
         }
 
         core.info(`🎯 Triggering workflow ${targetWorkflow} in ${targetOwner}/${targetRepo}`)
