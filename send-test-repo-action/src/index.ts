@@ -10,7 +10,7 @@ function getPackageJson(): Record<string, any> | null {
         const packagePath = path.join(process.cwd(), 'package.json')
         const packageContent = fs.readFileSync(packagePath, 'utf-8')
         return JSON.parse(packageContent)
-    } catch (error) {
+    } catch (erm) {
         return null
     }
 }
@@ -90,7 +90,6 @@ async function run(): Promise<void> {
         // Set outputs
         core.setOutput('artifact-id', uploadResponse.id!.toString())
         core.setOutput('artifact-name', artifactName)
-        core.setOutput('repository', `${github.context.repo.owner}/${github.context.repo.repo}`)
 
         core.debug(`🔗 Artifact ID: ${uploadResponse.id}`)
         core.debug(`🏷️  Artifact name: ${artifactName}`)
@@ -136,25 +135,25 @@ async function run(): Promise<void> {
 
         core.endGroup()
 
-    } catch (error) {
+    } catch (erm) {
         core.endGroup() // End any open group
 
         core.startGroup('❌ Error handling')
 
         // Handle errors - status will be in error.status for HTTP errors
-        if (typeof error === 'object' && error !== null && 'status' in error) {
-            const err = error as { status: number, message?: string }
+        if (typeof erm === 'object' && erm !== null && 'status' in erm) {
+            const err = erm as { status: number, message?: string }
             core.error(`HTTP Error ${err.status}: ${err.message}`)
             core.setFailed(`HTTP Error ${err.status}: ${err.message}`)
         } else {
-            const errorMessage = error instanceof Error ? error.message : String(error)
+            const errorMessage = erm instanceof Error ? erm.message : String(erm)
             core.error(`Unexpected error: ${errorMessage}`)
             core.setFailed(errorMessage)
         }
 
         // Log stack trace for debugging
-        if (error instanceof Error && error.stack) {
-            core.debug(`Stack trace: ${error.stack}`)
+        if (erm instanceof Error && erm.stack) {
+            core.debug(`Stack trace: ${erm.stack}`)
         }
 
         core.endGroup()
