@@ -9,5 +9,8 @@
     "build": "echo \"Building subdirectories...\"",
     "test-reports": "pnpm --filter=@neuropilot/send-test-repo"
   },
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@changesets/cli": "^2.29.7"
+  }
 }
